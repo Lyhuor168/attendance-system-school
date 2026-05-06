@@ -1,0 +1,40 @@
+[90m= [39m[34;4mIlluminate\Database\Eloquent\Collection[39;24m {#8585
+    [34mall[39m: [
+      [34;4mApp\Models\Classes[39;24m {#8589
+        [34mid[39m: [35m1[39m,
+        [34mname[39m: [32m"[39m[32mសុខ មីនា[39m[32m"[39m,
+        [34msubject[39m: [32m"[39m[32mEnglish[39m[32m"[39m,
+        [34mteacher[39m: [32m"[39m[32mlyly[39m[32m"[39m,
+        [34myear[39m: [36mnull[39m,
+        [34mcreated_at[39m: [32m"[39m[32m2026-05-04 02:01:32[39m[32m"[39m,
+        [34mupdated_at[39m: [32m"[39m[32m2026-05-04 02:01:32[39m[32m"[39m,
+      },
+      [34;4mApp\Models\Classes[39;24m {#8590
+        [34mid[39m: [35m2[39m,
+        [34mname[39m: [32m"[39m[32mវណ្ណឌី សុភ័ក្ត្រ[39m[32m"[39m,
+        [34msubject[39m: [32m"[39m[32mEnglish[39m[32m"[39m,
+        [34mteacher[39m: [32m"[39m[32mlyly[39m[32m"[39m,
+        [34myear[39m: [36mnull[39m,
+        [34mcreated_at[39m: [32m"[39m[32m2026-05-04 02:01:42[39m[32m"[39m,
+        [34mupdated_at[39m: [32m"[39m[32m2026-05-04 02:01:42[39m[32m"[39m,
+      },
+      [34;4mApp\Models\Classes[39;24m {#8587
+        [34mid[39m: [35m3[39m,
+        [34mname[39m: [32m"[39m[32mជា កល្យាណ[39m[32m"[39m,
+        [34msubject[39m: [32m"[39m[32mEnglish[39m[32m"[39m,
+        [34mteacher[39m: [32m"[39m[32mlyly[39m[32m"[39m,
+        [34myear[39m: [36mnull[39m,
+        [34mcreated_at[39m: [32m"[39m[32m2026-05-04 02:01:59[39m[32m"[39m,
+        [34mupdated_at[39m: [32m"[39m[32m2026-05-04 02:01:59[39m[32m"[39m,
+      },
+      [34;4mApp\Models\Classes[39;24m {#8586
+        [34mid[39m: [35m4[39m,
+        [34mname[39m: [32m"[39m[32mសុខ សំណាង[39m[32m"[39m,
+        [34msubject[39m: [32m"[39m[32mEnglish[39m[32m"[39m,
+        [34mteacher[39m: [32m"[39m[32mlyly[39m[32m"[39m,
+        [34myear[39m: [36mnull[39m,
+        [34mcreated_at[39m: [32m"[39m[32m2026-05-04 02:02:58[39m[32m"[39m,
+        [34mupdated_at[39m: [32m"[39m[32m2026-05-04 02:02:58[39m[32m"[39m,
+      },
+    ],
+  }
