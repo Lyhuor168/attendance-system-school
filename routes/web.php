@@ -7,10 +7,23 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\PermissionController;
 
+// Home redirect
+Route::get('/', function () {
+    if (auth()->check()) {
+        $role = auth()->user()->role;
+        return match($role) {
+            'admin'   => redirect()->route('admin.dashboard'),
+            'teacher' => redirect()->route('teacher.dashboard'),
+            'student' => redirect()->route('student.dashboard'),
+            default   => redirect()->route('login'),
+        };
+    }
+    return redirect()->route('login');
+});
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])
@@ -52,7 +65,6 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 });
 
 
-// Student Management
 Route::get('/admin/students', [AdminController::class, 'students'])
     ->name('admin.students');
 Route::post('/admin/students', [AdminController::class, 'storeStudent'])
@@ -74,4 +86,6 @@ Route::put('/teacher/permissions/{id}', [PermissionController::class, 'update'])
     Route::get('/student/profile', [StudentController::class, 'profile'])
     ->name('student.profile');
 Route::put('/student/profile', [StudentController::class, 'updateProfile'])
-    ->name('student.profile.update');
+    ->name('student.profile.update'
+);
+

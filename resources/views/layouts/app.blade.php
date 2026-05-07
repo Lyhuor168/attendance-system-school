@@ -18,8 +18,31 @@
             </svg>
         </div>
         <span class="font-bold text-gray-800">Attendance System</span>
+        @php
+            $pendingCount = 0;
+            if(Auth::check() && Auth::user()->role == 'teacher') {
+                $pendingCount = App\Models\PermissionRequest::where('status','pending')->count();
+            }
+            if(Auth::check() && Auth::user()->role == 'student') {
+                $student = Auth::user()->student;
+                $pendingCount = $student ? App\Models\PermissionRequest::where('student_id', $student->id)->where('status','pending')->count() : 0;
+            }
+        @endphp
     </div>
     <div class="flex items-center gap-4">
+        {{-- Notification Bell --}}
+        @if(Auth::check() && Auth::user()->role == 'teacher' && $pendingCount > 0)
+        <a href="{{ route('teacher.permissions') }}"
+           class="relative flex items-center text-gray-500 hover:text-gray-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {{ $pendingCount }}
+            </span>
+        </a>
+        @endif
         <span class="text-sm text-gray-500">👤 {{ Auth::user()->name }}</span>
         @php $role = Auth::user()->role; @endphp
         <span class="text-xs px-3 py-1 rounded-full
@@ -79,6 +102,11 @@
                 <a href="{{ route('teacher.permissions') }}"
                    class="nav-item {{ request()->is('teacher/permissions') ? 'active' : '' }}">
                     📋 Permission Requests
+                    @if($pendingCount > 0)
+                    <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                        {{ $pendingCount }}
+                    </span>
+                    @endif
                 </a>
 
             @elseif(Auth::user()->role == 'student')
@@ -93,6 +121,11 @@
                 <a href="{{ route('student.permissions') }}"
                    class="nav-item {{ request()->is('student/permissions') ? 'active' : '' }}">
                     📋 ស្នើសុំច្បាប់
+                    @if($pendingCount > 0)
+                    <span class="ml-auto bg-yellow-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                        {{ $pendingCount }}
+                    </span>
+                    @endif
                 </a>
             @endif
 

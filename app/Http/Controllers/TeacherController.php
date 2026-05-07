@@ -9,14 +9,12 @@ use App\Models\Classes;
 
 class TeacherController extends Controller
 {
-    // Dashboard — កត់វត្តមានថ្ងៃនេះ
     public function index()
     {
         $classes = Classes::all();
         return view('teacher.dashboard', compact('classes'));
     }
 
-    // Store — រក្សាទុកវត្តមាន
     public function store(Request $request)
     {
         $request->validate([
@@ -42,7 +40,6 @@ class TeacherController extends Controller
         return redirect()->back()->with('success', 'វត្តមានត្រូវបានរក្សាទុក!');
     }
 
-    // Edit — កែវត្តមានចាស់
     public function edit()
     {
         $classes = Classes::all();
@@ -55,7 +52,6 @@ class TeacherController extends Controller
         return view('teacher.edit', compact('classes', 'records'));
     }
 
-    // Update — Save ការកែ
     public function update(Request $request, $id)
     {
         $attendance = Attendance::findOrFail($id);
@@ -66,7 +62,6 @@ class TeacherController extends Controller
         return redirect()->back()->with('success', 'វត្តមានត្រូវបានកែ!');
     }
 
-    // Report — Print
     public function report()
     {
         $classes = Classes::all();
@@ -78,7 +73,6 @@ class TeacherController extends Controller
         return view('teacher.report', compact('classes', 'records'));
     }
 
-    // Get Students by Class (AJAX)
     public function getStudents($class_id)
     {
         $students = Student::with('user')

@@ -88,7 +88,7 @@
                     <tr class="text-left text-gray-400 border-b">
                         <th class="pb-2">សិស្ស</th>
                         <th class="pb-2">ថ្នាក់</th>
-                        <th class="pb-2">ថ្ងៃ</th>
+                        <th class="pb-2">ឆ្នាំ-ខែ-ថ្ងៃ</th>
                         <th class="pb-2">ស្ថានភាព</th>
                     </tr>
                 </thead>

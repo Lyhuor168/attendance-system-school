@@ -2,7 +2,15 @@
 @section('title', 'Permission Requests')
 @section('content')
 
-<h1 class="text-xl font-bold text-gray-800 mb-6">📋 Permission Requests សិស្ស</h1>
+<div class="flex items-center gap-3 mb-6">
+    <h1 class="text-xl font-bold text-gray-800">📋 Permission Requests សិស្ស</h1>
+    @php $pending = App\Models\PermissionRequest::where('status','pending')->count(); @endphp
+    @if($pending > 0)
+    <span class="bg-red-500 text-white text-sm px-3 py-0.5 rounded-full font-medium">
+        {{ $pending }} Pending
+    </span>
+    @endif
+</div>
 
 @if(session('success'))
 <div class="bg-green-100 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm">✅ {{ session('success') }}</div>
