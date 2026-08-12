@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'student_number', 'school_class_id', 'date_of_birth', 'guardian_name', 'guardian_phone'])]
+#[Fillable(['name', 'student_number', 'school_class_id', 'date_of_birth', 'guardian_name', 'guardian_phone', 'user_id'])]
 #[UsePolicy(StudentPolicy::class)]
 class Student extends Model
 {
@@ -40,5 +40,26 @@ class Student extends Model
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function hasPortalAccess(): bool
+    {
+        return $this->user_id !== null;
     }
 }

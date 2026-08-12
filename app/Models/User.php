@@ -43,11 +43,24 @@ class User extends Authenticatable
         return $this->role === Role::Teacher;
     }
 
+    public function isStudent(): bool
+    {
+        return $this->role === Role::Student;
+    }
+
     /**
      * @return HasOne<Teacher, $this>
      */
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);
+    }
+
+    /**
+     * @return HasOne<Student, $this>
+     */
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class);
     }
 }

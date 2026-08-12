@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -26,7 +30,25 @@ class StudentController extends Controller
 
     public function store(StoreStudentRequest $request): RedirectResponse
     {
-        Student::create($request->validated());
+        $validated = $request->validated();
+        $email = $validated['email'] ?? null;
+        $password = $validated['password'] ?? null;
+        unset($validated['email'], $validated['password']);
+
+        DB::transaction(function () use ($validated, $email, $password): void {
+            $student = Student::create($validated);
+
+            if ($email !== null) {
+                $user = User::create([
+                    'name' => $student->name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'role' => Role::Student,
+                ]);
+
+                $student->update(['user_id' => $user->id]);
+            }
+        });
 
         return redirect()->route('students.index')->with('status', 'Student created.');
     }
@@ -48,7 +70,10 @@ class StudentController extends Controller
 
     public function destroy(Student $student): RedirectResponse
     {
-        $student->delete();
+        DB::transaction(function () use ($student): void {
+            $student->delete();
+            $student->user?->delete();
+        });
 
         return redirect()->route('students.index')->with('status', 'Student deleted.');
     }

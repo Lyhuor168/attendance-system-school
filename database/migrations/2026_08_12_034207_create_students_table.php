@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('guardian_name')->nullable();
             $table->string('guardian_phone')->nullable();
+            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

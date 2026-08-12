@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -29,6 +30,8 @@ class StoreStudentRequest extends FormRequest
             'date_of_birth' => ['nullable', 'date'],
             'guardian_name' => ['nullable', 'string', 'max:255'],
             'guardian_phone' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required_with:email', 'nullable', 'confirmed', Password::defaults()],
         ];
     }
 }

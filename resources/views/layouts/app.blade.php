@@ -14,23 +14,35 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
+        <div class="flex h-screen overflow-hidden bg-slate-50">
+            @include('layouts.sidebar')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <div
+                x-show="sidebarOpen"
+                x-cloak
+                @click="sidebarOpen = false"
+                class="fixed inset-0 z-30 bg-slate-900/50 lg:hidden"
+            ></div>
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+            <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+                @include('layouts.navigation')
+
+                <main class="flex-1 overflow-y-auto">
+                    <!-- Page Heading -->
+                    @isset($header)
+                        <header class="bg-white shadow-sm">
+                            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                                {{ $header }}
+                            </div>
+                        </header>
+                    @endisset
+
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
+
+        @stack('scripts')
     </body>
 </html>

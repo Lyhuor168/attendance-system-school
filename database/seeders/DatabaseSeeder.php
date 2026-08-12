@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\AttendanceStatus;
 use App\Enums\DayOfWeek;
+use App\Enums\PaymentStatus;
 use App\Models\AttendanceRecord;
+use App\Models\Payment;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Subject;
@@ -40,6 +42,10 @@ class DatabaseSeeder extends Seeder
         $classes->each(function (SchoolClass $class): void {
             $students = Student::factory(15)->create(['school_class_id' => $class->id]);
 
+            $portalStudent = $students->first();
+            $portalUser = User::factory()->student()->create(['name' => $portalStudent->name]);
+            $portalStudent->update(['user_id' => $portalUser->id]);
+
             $days = collect(DayOfWeek::cases())->take(5);
 
             $days->each(fn (DayOfWeek $day, int $index) => Timetable::factory()->create([
@@ -51,12 +57,41 @@ class DatabaseSeeder extends Seeder
                 'end_time' => sprintf('%02d:00', 9 + $index),
             ]));
 
-            $students->each(fn (Student $student) => AttendanceRecord::factory()->create([
-                'student_id' => $student->id,
-                'school_class_id' => $class->id,
-                'recorded_by' => $class->homeroomTeacher->user_id,
-                'status' => fake()->randomElement(AttendanceStatus::cases()),
-            ]));
+            $students->each(function (Student $student) use ($class): void {
+                for ($daysAgo = 0; $daysAgo < 7; $daysAgo++) {
+                    AttendanceRecord::factory()->create([
+                        'student_id' => $student->id,
+                        'school_class_id' => $class->id,
+                        'recorded_by' => $class->homeroomTeacher->user_id,
+                        'date' => today()->subDays($daysAgo),
+                        'status' => fake()->randomElement([
+                            AttendanceStatus::Present,
+                            AttendanceStatus::Present,
+                            AttendanceStatus::Present,
+                            AttendanceStatus::Absent,
+                            AttendanceStatus::Late,
+                            AttendanceStatus::Excused,
+                        ]),
+                    ]);
+                }
+
+                for ($i = 0, $count = fake()->numberBetween(1, 3); $i < $count; $i++) {
+                    $status = fake()->randomElement([
+                        PaymentStatus::Paid,
+                        PaymentStatus::Paid,
+                        PaymentStatus::Paid,
+                        PaymentStatus::Partial,
+                        PaymentStatus::Unpaid,
+                    ]);
+
+                    Payment::factory()->create([
+                        'student_id' => $student->id,
+                        'recorded_by' => $class->homeroomTeacher->user_id,
+                        'status' => $status,
+                        'amount' => $status === PaymentStatus::Unpaid ? 0 : fake()->randomFloat(2, 50, 500),
+                    ]);
+                }
+            });
         });
     }
 }

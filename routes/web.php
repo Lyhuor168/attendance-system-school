@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceRecordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\StudentController;
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('classes', SchoolClassController::class)->except('show')->parameters(['classes' => 'schoolClass']);
         Route::resource('students', StudentController::class)->except('show');
         Route::resource('timetables', TimetableController::class)->except('show');
+
+        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+        Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
     });
 });
 
