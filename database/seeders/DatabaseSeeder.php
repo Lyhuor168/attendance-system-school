@@ -135,5 +135,62 @@ class DatabaseSeeder extends Seeder
                 ]);
             });
         });
+
+        $this->seedYearFourItEveningClasses();
+    }
+
+    /**
+     * Seed the two Year 4 IT evening sections (IT10B1, IT10B2), their 6 IT
+     * subjects, and a dedicated teacher per subject (assigned to both
+     * sections via the class_teacher pivot), with a Monday-Saturday
+     * timetable where each day's teacher matches that day's subject.
+     */
+    private function seedYearFourItEveningClasses(): void
+    {
+        $subjects = collect([
+            ['name' => 'Programming', 'code' => 'IT-PRG4'],
+            ['name' => 'Network Engineering', 'code' => 'IT-NET4'],
+            ['name' => 'Database System', 'code' => 'IT-DB4'],
+            ['name' => 'Data Analytics', 'code' => 'IT-DA4'],
+            ['name' => 'Enterprise Systems', 'code' => 'IT-ES4'],
+            ['name' => 'Cyber Security', 'code' => 'IT-CS4'],
+        ])->map(fn (array $attributes) => Subject::factory()->create($attributes));
+
+        $teachers = $subjects->map(fn () => Teacher::factory()->create([
+            'user_id' => User::factory()->teacher()->create()->id,
+        ]));
+
+        $days = collect(DayOfWeek::cases())->reject(fn (DayOfWeek $day) => $day === DayOfWeek::Sunday)->values();
+
+        // The Programming and Network Engineering teachers double as
+        // homeroom teacher for IT10B1 and IT10B2 respectively.
+        $sections = ['IT10B1' => $teachers[0], 'IT10B2' => $teachers[1]];
+
+        foreach ($sections as $section => $homeroomTeacher) {
+            $class = SchoolClass::factory()->create([
+                'name' => "{$section} - ការវិភាគទិន្នន័យឆ្នាំទី ៤",
+                'grade_level' => '4',
+                'homeroom_teacher_id' => $homeroomTeacher->id,
+            ]);
+
+            Student::factory(15)->create(['school_class_id' => $class->id]);
+
+            $subjects->each(function (Subject $subject, int $index) use ($class, $teachers): void {
+                ClassTeacher::create([
+                    'teacher_id' => $teachers[$index]->id,
+                    'school_class_id' => $class->id,
+                    'subject_id' => $subject->id,
+                ]);
+            });
+
+            $days->each(fn (DayOfWeek $day, int $index) => Timetable::factory()->create([
+                'school_class_id' => $class->id,
+                'subject_id' => $subjects[$index]->id,
+                'teacher_id' => $teachers[$index]->id,
+                'day_of_week' => $day->value,
+                'start_time' => '17:30',
+                'end_time' => '18:30',
+            ]));
+        }
     }
 }
