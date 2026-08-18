@@ -11,6 +11,25 @@
     <div class="hidden lg:block"></div>
 
     <div class="flex items-center gap-4">
+        <x-dropdown align="right" width="40">
+            <x-slot name="trigger">
+                <button class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                    <span>{{ config('app.available_locales')[app()->getLocale()] ?? strtoupper(app()->getLocale()) }}</span>
+                    <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </x-slot>
+
+            <x-slot name="content">
+                @foreach (config('app.available_locales') as $locale => $label)
+                    <x-dropdown-link :href="route('language.switch', $locale)" class="{{ app()->getLocale() === $locale ? 'font-semibold text-indigo-600' : '' }}">
+                        {{ $label }}
+                    </x-dropdown-link>
+                @endforeach
+            </x-slot>
+        </x-dropdown>
+
         <x-dropdown align="right" width="48">
             <x-slot name="trigger">
                 <button class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">

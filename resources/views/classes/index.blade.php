@@ -32,6 +32,7 @@
                                 <td class="px-6 py-4">{{ $class->grade_level }}</td>
                                 <td class="px-6 py-4">{{ $class->homeroomTeacher?->user?->name ?? '—' }}</td>
                                 <td class="px-6 py-4 text-right space-x-2">
+                                    <a href="{{ route('class-teachers.index', $class) }}" class="text-indigo-600 hover:underline">{{ __('Teachers') }}</a>
                                     <a href="{{ route('classes.edit', $class) }}" class="text-indigo-600 hover:underline">{{ __('Edit') }}</a>
                                     <form action="{{ route('classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Delete this class?') }}')">
                                         @csrf

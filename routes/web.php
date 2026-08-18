@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\AttendanceRecordController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ClassTeacherController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SchoolClassController;
@@ -14,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 })->name('home');
+
+Route::get('/language/{locale}', [LocaleController::class, 'update'])->name('language.switch');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,12 +36,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendance/{schoolClass}/{date}', [AttendanceRecordController::class, 'show'])
         ->middleware('can:record,schoolClass')->name('attendance.show');
 
+    Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::get('/leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+    Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::post('/leave-requests/{leaveRequest}/respond', [LeaveRequestController::class, 'respond'])->name('leave-requests.respond');
+    Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy'])->name('leave-requests.destroy');
+
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{student}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{student}', [ChatController::class, 'store'])->name('chat.store');
+
     Route::middleware('admin')->group(function () {
         Route::resource('teachers', TeacherController::class)->except('show');
         Route::resource('subjects', SubjectController::class)->except('show');
         Route::resource('classes', SchoolClassController::class)->except('show')->parameters(['classes' => 'schoolClass']);
         Route::resource('students', StudentController::class)->except('show');
         Route::resource('timetables', TimetableController::class)->except('show');
+
+        Route::get('/classes/{schoolClass}/teachers', [ClassTeacherController::class, 'index'])->name('class-teachers.index');
+        Route::post('/classes/{schoolClass}/teachers', [ClassTeacherController::class, 'store'])->name('class-teachers.store');
+        Route::delete('/class-teachers/{classTeacher}', [ClassTeacherController::class, 'destroy'])->name('class-teachers.destroy');
 
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
         Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');

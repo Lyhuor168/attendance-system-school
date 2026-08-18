@@ -19,7 +19,7 @@ class AttendanceRecordController extends Controller
 
         $classes = $user->isAdmin()
             ? SchoolClass::with('homeroomTeacher.user')->orderBy('name')->get()
-            : $user->teacher?->homeroomClasses()->orderBy('name')->get() ?? collect();
+            : SchoolClass::whereIn('id', $user->teacher?->allClassIds() ?? collect())->orderBy('name')->get();
 
         return view('attendance.index', ['classes' => $classes]);
     }

@@ -6,7 +6,7 @@
                 <p class="mt-1 text-sm text-slate-500">{{ __('Welcome back, :name.', ['name' => auth()->user()->name]) }}</p>
             </div>
 
-            @unless ($isStudent)
+            @unless ($isStudent || $isGuardian)
                 <div class="flex flex-wrap gap-2">
                     <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 hover:shadow-md">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -145,6 +145,33 @@
                     {{ __('No student profile is linked to your account yet. Contact your school administrator.') }}
                 </div>
             @endif
+        @elseif ($isGuardian)
+            @if ($guardian)
+                <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h3 class="mb-3 text-sm font-semibold text-slate-700">{{ __('Your Children') }}</h3>
+                    @forelse ($children as $child)
+                        <div class="text-sm text-slate-600">{{ $child->name }} &mdash; {{ $child->schoolClass->name }}</div>
+                    @empty
+                        <div class="text-sm text-slate-500">{{ __('No students linked to your account yet.') }}</div>
+                    @endforelse
+                </div>
+
+                <a href="{{ route('chat.index') }}" class="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">{{ __('Messages with Teachers') }}</p>
+                            <p class="text-2xl font-bold text-slate-800">{{ $unreadMessages }} {{ __('unread') }}</p>
+                        </div>
+                    </div>
+                </a>
+            @else
+                <div class="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
+                    {{ __('No guardian profile is linked to your account yet. Contact your school administrator.') }}
+                </div>
+            @endif
         @else
 
         {{-- KPI Cards --}}
@@ -204,11 +231,11 @@
 
         @unless ($isAdmin)
             <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 class="mb-3 text-sm font-semibold text-slate-700">{{ __('Your Class') }}</h3>
-                @forelse ($homeroomClasses as $class)
+                <h3 class="mb-3 text-sm font-semibold text-slate-700">{{ __('Your Classes') }}</h3>
+                @forelse ($assignedClasses as $class)
                     <div class="text-sm text-slate-600">{{ $class->name }} ({{ $class->grade_level }})</div>
                 @empty
-                    <div class="text-sm text-slate-500">{{ __('No homeroom class assigned yet.') }}</div>
+                    <div class="text-sm text-slate-500">{{ __('No classes assigned yet.') }}</div>
                 @endforelse
             </div>
         @endunless
@@ -310,28 +337,30 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const attendanceTrendCanvas = document.getElementById('attendanceTrendChart');
 
-                if (attendanceTrendCanvas) {
-                    new Chart(attendanceTrendCanvas, {
-                        type: 'line',
-                        data: {
-                            labels: @json($attendanceTrend['labels']),
-                            datasets: [{
-                                label: 'Attendance %',
-                                data: @json($attendanceTrend['data']),
-                                borderColor: 'rgb(79, 70, 229)',
-                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                                tension: 0.35,
-                                fill: true,
-                                pointRadius: 3,
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { beginAtZero: true, max: 100, ticks: { callback: (v) => v + '%' } } },
-                        },
-                    });
-                }
+                @unless ($isGuardian)
+                    if (attendanceTrendCanvas) {
+                        new Chart(attendanceTrendCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: @json($attendanceTrend['labels']),
+                                datasets: [{
+                                    label: 'Attendance %',
+                                    data: @json($attendanceTrend['data']),
+                                    borderColor: 'rgb(79, 70, 229)',
+                                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                    tension: 0.35,
+                                    fill: true,
+                                    pointRadius: 3,
+                                }],
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: { y: { beginAtZero: true, max: 100, ticks: { callback: (v) => v + '%' } } },
+                            },
+                        });
+                    }
+                @endunless
 
                 @if ($isAdmin)
                     new Chart(document.getElementById('revenueChart'), {

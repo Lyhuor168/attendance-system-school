@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\AttendanceStatus;
 use App\Models\AttendanceRecord;
+use App\Models\ChatMessage;
+use App\Models\Guardian;
 use App\Models\Payment;
 use App\Models\SchoolClass;
 use App\Models\Student;
@@ -32,7 +34,15 @@ class DashboardController extends Controller
             return view('dashboard', $this->studentData($user->student));
         }
 
-        return view('dashboard', $this->teacherData($user->teacher?->homeroomClasses ?? collect()));
+        if ($user->isGuardian()) {
+            return view('dashboard', $this->guardianData($user->guardian));
+        }
+
+        $assignedClasses = $user->teacher
+            ? SchoolClass::whereIn('id', $user->teacher->allClassIds())->orderBy('name')->get()
+            : collect();
+
+        return view('dashboard', $this->teacherData($assignedClasses));
     }
 
     /**
@@ -45,6 +55,7 @@ class DashboardController extends Controller
         return [
             'isAdmin' => true,
             'isStudent' => false,
+            'isGuardian' => false,
             'kpis' => [
                 'totalStudents' => Student::count(),
                 'totalStaff' => Teacher::count(),
@@ -64,17 +75,18 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Collection<int, SchoolClass>  $homeroomClasses
+     * @param  Collection<int, SchoolClass>  $assignedClasses
      * @return array<string, mixed>
      */
-    private function teacherData(Collection $homeroomClasses): array
+    private function teacherData(Collection $assignedClasses): array
     {
-        $classIds = $homeroomClasses->pluck('id');
+        $classIds = $assignedClasses->pluck('id');
 
         return [
             'isAdmin' => false,
             'isStudent' => false,
-            'homeroomClasses' => $homeroomClasses,
+            'isGuardian' => false,
+            'assignedClasses' => $assignedClasses,
             'kpis' => [
                 'totalStudents' => Student::whereIn('school_class_id', $classIds)->count(),
                 'todayAttendancePercentage' => $this->attendancePercentage($classIds, Carbon::today()),
@@ -97,6 +109,7 @@ class DashboardController extends Controller
             return [
                 'isAdmin' => false,
                 'isStudent' => true,
+                'isGuardian' => false,
                 'student' => null,
                 'kpis' => ['attendancePercentage' => 0, 'totalFeesPaid' => 0],
                 'attendanceTrend' => ['labels' => [], 'data' => []],
@@ -108,6 +121,7 @@ class DashboardController extends Controller
         return [
             'isAdmin' => false,
             'isStudent' => true,
+            'isGuardian' => false,
             'student' => $student,
             'kpis' => [
                 'attendancePercentage' => $this->studentAttendancePercentageThisMonth($student),
@@ -116,6 +130,34 @@ class DashboardController extends Controller
             'attendanceTrend' => $this->studentAttendanceTrend($student),
             'recentAttendance' => $student->attendanceRecords()->latest('date')->take(7)->get(),
             'payments' => $student->payments()->latest('paid_at')->take(5)->get(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function guardianData(?Guardian $guardian): array
+    {
+        if ($guardian === null) {
+            return [
+                'isAdmin' => false,
+                'isStudent' => false,
+                'isGuardian' => true,
+                'guardian' => null,
+                'children' => collect(),
+                'unreadMessages' => 0,
+            ];
+        }
+
+        return [
+            'isAdmin' => false,
+            'isStudent' => false,
+            'isGuardian' => true,
+            'guardian' => $guardian,
+            'children' => $guardian->students()->with('schoolClass')->get(),
+            'unreadMessages' => ChatMessage::where('receiver_id', $guardian->user_id)
+                ->where('is_read', false)
+                ->count(),
         ];
     }
 

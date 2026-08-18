@@ -16,6 +16,14 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+            <div class="mb-4 flex gap-3 text-sm font-medium text-gray-500">
+                @foreach (config('app.available_locales') as $locale => $label)
+                    <a href="{{ route('language.switch', $locale) }}" class="{{ app()->getLocale() === $locale ? 'text-indigo-600' : 'hover:text-gray-700' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+
             <div>
                 <a href="/">
                     <x-application-logo class="w-20 h-20 fill-current text-gray-500" />

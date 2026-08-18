@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Enums\AttendanceStatus;
-use App\Policies\AttendancePolicy;
+use App\Enums\LeaveRequestStatus;
+use App\Policies\LeaveRequestPolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['student_id', 'school_class_id', 'date', 'status', 'recorded_by', 'remarks'])]
-#[UsePolicy(AttendancePolicy::class)]
-class AttendanceRecord extends Model
+#[Fillable(['student_id', 'school_class_id', 'teacher_id', 'reason', 'from_date', 'to_date', 'status', 'reviewed_by'])]
+#[UsePolicy(LeaveRequestPolicy::class)]
+class LeaveRequest extends Model
 {
     use HasFactory;
 
@@ -22,8 +22,9 @@ class AttendanceRecord extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date:Y-m-d',
-            'status' => AttendanceStatus::class,
+            'from_date' => 'date:Y-m-d',
+            'to_date' => 'date:Y-m-d',
+            'status' => LeaveRequestStatus::class,
         ];
     }
 
@@ -44,10 +45,18 @@ class AttendanceRecord extends Model
     }
 
     /**
+     * @return BelongsTo<Teacher, $this>
+     */
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
-    public function recordedBy(): BelongsTo
+    public function reviewedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'recorded_by');
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

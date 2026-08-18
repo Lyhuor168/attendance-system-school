@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'grade_level', 'homeroom_teacher_id'])]
@@ -46,5 +47,34 @@ class SchoolClass extends Model
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class);
+    }
+
+    /**
+     * @return HasMany<ClassTeacher, $this>
+     */
+    public function classAssignments(): HasMany
+    {
+        return $this->hasMany(ClassTeacher::class);
+    }
+
+    /**
+     * Teachers assigned to this class via the class_teacher pivot (does not
+     * include the homeroom teacher unless they are also pivot-assigned).
+     *
+     * @return BelongsToMany<Teacher, $this>
+     */
+    public function assignedTeachers(): BelongsToMany
+    {
+        return $this->belongsToMany(Teacher::class, 'class_teacher', 'school_class_id', 'teacher_id')
+            ->withPivot('subject_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<LeaveRequest, $this>
+     */
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
     }
 }

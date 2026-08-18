@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use App\Models\AttendanceRecord;
+use App\Models\ClassTeacher;
 use App\Models\User;
 
-class AttendanceRecordPolicy
+class ClassTeacherPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -18,7 +18,7 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, AttendanceRecord $attendanceRecord): bool
+    public function view(User $user, ClassTeacher $classTeacher): bool
     {
         return $user->isAdmin();
     }
@@ -34,7 +34,7 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, AttendanceRecord $attendanceRecord): bool
+    public function update(User $user, ClassTeacher $classTeacher): bool
     {
         return $user->isAdmin();
     }
@@ -42,7 +42,7 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, AttendanceRecord $attendanceRecord): bool
+    public function delete(User $user, ClassTeacher $classTeacher): bool
     {
         return $user->isAdmin();
     }
@@ -50,7 +50,7 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, AttendanceRecord $attendanceRecord): bool
+    public function restore(User $user, ClassTeacher $classTeacher): bool
     {
         return $user->isAdmin();
     }
@@ -58,7 +58,7 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, AttendanceRecord $attendanceRecord): bool
+    public function forceDelete(User $user, ClassTeacher $classTeacher): bool
     {
         return $user->isAdmin();
     }

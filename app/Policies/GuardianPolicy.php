@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use App\Models\SchoolClass;
+use App\Models\Guardian;
 use App\Models\User;
 
-class SchoolClassPolicy
+class GuardianPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -18,7 +18,7 @@ class SchoolClassPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, SchoolClass $schoolClass): bool
+    public function view(User $user, Guardian $guardian): bool
     {
         return $user->isAdmin();
     }
@@ -34,7 +34,7 @@ class SchoolClassPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, SchoolClass $schoolClass): bool
+    public function update(User $user, Guardian $guardian): bool
     {
         return $user->isAdmin();
     }
@@ -42,7 +42,7 @@ class SchoolClassPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, SchoolClass $schoolClass): bool
+    public function delete(User $user, Guardian $guardian): bool
     {
         return $user->isAdmin();
     }
@@ -50,7 +50,7 @@ class SchoolClassPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, SchoolClass $schoolClass): bool
+    public function restore(User $user, Guardian $guardian): bool
     {
         return $user->isAdmin();
     }
@@ -58,19 +58,8 @@ class SchoolClassPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, SchoolClass $schoolClass): bool
+    public function forceDelete(User $user, Guardian $guardian): bool
     {
         return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can record or view attendance for the class:
-     * Admins may act on any class, Teachers only on classes assigned to them
-     * (homeroom or via the class_teacher pivot).
-     */
-    public function record(User $user, SchoolClass $schoolClass): bool
-    {
-        return $user->isAdmin()
-            || ($user->teacher?->allClassIds()->contains($schoolClass->id) ?? false);
     }
 }

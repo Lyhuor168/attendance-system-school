@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->role === Role::Student;
     }
 
+    public function isGuardian(): bool
+    {
+        return $this->role === Role::Guardian;
+    }
+
     /**
      * @return HasOne<Teacher, $this>
      */
@@ -62,5 +67,13 @@ class User extends Authenticatable
     public function student(): HasOne
     {
         return $this->hasOne(Student::class);
+    }
+
+    /**
+     * @return HasOne<Guardian, $this>
+     */
+    public function guardian(): HasOne
+    {
+        return $this->hasOne(Guardian::class);
     }
 }

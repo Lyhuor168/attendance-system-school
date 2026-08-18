@@ -1,65 +1,58 @@
-version: '3.8'
-
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: attendance-system-app
-    container_name: attendance-app
-    restart: unless-stopped
-    tty: true
-    working_dir: /var/www
-    volumes:
-      - .:/var/www
-    networks:
-      - attendance-network
-
-  webserver:
-    image: nginx:alpine
-    container_name: attendance-webserver
-    restart: unless-stopped
-    ports:
-      - "8000:80"
-    volumes:
-      - .:/var/www
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - attendance-network
-
-  db:
-    image: mysql:8.0
-    container_name: attendance-db
-    restart: unless-stopped
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: attendance_db
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_USER: attendance_user
-      MYSQL_PASSWORD: userpassword
-    volumes:
-      - dbdata:/var/lib/mysql
-    networks:
-      - attendance-network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: attendance-phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: rootpassword
-    networks:
-      - attendance-network
-
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: attendance-system-app
+        container_name: attendance-app
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www
+        volumes:
+            - '.:/var/www'
+        networks:
+            - attendance-network
+    webserver:
+        image: 'nginx:alpine'
+        container_name: attendance-webserver
+        restart: unless-stopped
+        ports:
+            - '8000:80'
+        volumes:
+            - '.:/var/www'
+            - './nginx.conf:/etc/nginx/conf.d/default.conf'
+        networks:
+            - attendance-network
+    db:
+        image: 'mysql:8.0'
+        container_name: attendance-db
+        restart: unless-stopped
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_DATABASE: attendance_db
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_USER: attendance_user
+            MYSQL_PASSWORD: userpassword
+        volumes:
+            - 'dbdata:/var/lib/mysql'
+        networks:
+            - attendance-network
+    phpmyadmin:
+        image: 'phpmyadmin/phpmyadmin:latest'
+        container_name: attendance-phpmyadmin
+        restart: unless-stopped
+        ports:
+            - '8080:80'
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: rootpassword
+        networks:
+            - attendance-network
 networks:
-  attendance-network:
-    driver: bridge
-
+    attendance-network:
+        driver: bridge
 volumes:
-  dbdata:
-    driver: local
+    dbdata:
+        driver: local
